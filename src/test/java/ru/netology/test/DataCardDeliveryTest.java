@@ -2,6 +2,9 @@ package ru.netology.test;
 
 import com.codeborne.selenide.Selectors;
 import ru.netology.data.DataGenerator;
+import ru.netology.data.RegistrationByCardInfo;
+import ru.netology.data.DataGenerator.Registration;
+
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,17 +24,25 @@ public class DataCardDeliveryTest {
         open("http://0.0.0.0:7777");
     }
 
+
     @Test
     void shouldCorrectValues() {
-        $("[data-test-id = 'city'] input").setValue("Воронеж");
-        $("[placeholder = 'Дата встречи']").doubleClick().sendKeys(Keys.DELETE);
-        $("[data-test-id='date'] input").setValue(DataGenerator.calendarDate());
-        $("[data-test-id = 'name'] input").setValue(DataGenerator.fullName());
-        $("[data-test-id = 'phone'] input").setValue(DataGenerator.phoneNumber());
+        $("[data-test-id = 'city'] input")
+                .setValue(DataGenerator.generateCity());
+        $("[placeholder = 'Дата встречи']")
+                .doubleClick().sendKeys(Keys.DELETE);
+        $("[data-test-id='date'] input")
+                .setValue(DataGenerator.calendarDate());
+        $("[data-test-id = 'name'] input").
+                setValue(DataGenerator.Registration.generateByCard().getFullName());
+        $("[data-test-id = 'phone'] input")
+                .setValue(DataGenerator.Registration.generateByCard().getPhoneNumber());
         $("[data-test-id = 'agreement']").click();
         $(withText("Запланировать")).click();
         $("[data-test-id = 'success-notification'] .notification__title")
                 .shouldBe(visible, Duration.ofSeconds(15));
+        $("[data-test-id = 'success-notification'] .notification__content")
+                .shouldHave(text(DataGenerator.calendarDate()));
         $("[placeholder = 'Дата встречи']").doubleClick().sendKeys(Keys.DELETE);
         $("[data-test-id='date'] input").setValue(DataGenerator.calendarDate());
         $(withText("Запланировать")).click();
@@ -41,5 +52,8 @@ public class DataCardDeliveryTest {
         $("[class = 'button__text'] ").click();
         $(withText("Встреча успешно")).
                 shouldBe(visible, Duration.ofSeconds(15));
+        $("[data-test-id = 'success-notification'] .notification__content")
+                .shouldHave(text(DataGenerator.calendarDate()))
+                .shouldBe(visible, Duration.ofSeconds(15));
     }
 }
